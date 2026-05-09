@@ -31,4 +31,41 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ROUTE 3 : Récupérer UNE SEULE chanson via son ID (GET)
+router.get('/:id', async (req, res) => {
+  try {
+    const song = await Song.findById(req.params.id);
+    if (!song) {
+      return res.status(404).json({ message: "Chanson introuvable dans le coffre" });
+    }
+    res.status(200).json(song);
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la récupération", error: err });
+  }
+});
+
+// ROUTE 4 : Modifier une chanson (PUT) - Parfait pour sauvegarder un brouillon
+router.put('/:id', async (req, res) => {
+  try {
+    const updatedSong = await Song.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body }, // Met à jour uniquement les champs envoyés
+      { new: true }       // Demande à MongoDB de nous renvoyer la version mise à jour
+    );
+    res.status(200).json(updatedSong);
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la modification", error: err });
+  }
+});
+
+// ROUTE 5 : Supprimer une chanson (DELETE)
+router.delete('/:id', async (req, res) => {
+  try {
+    await Song.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Chanson supprimée avec succès 🗑️" });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la suppression", error: err });
+  }
+});
+
 module.exports = router;
