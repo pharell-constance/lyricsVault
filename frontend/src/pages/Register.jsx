@@ -1,28 +1,27 @@
 import { useState } from 'react';
-import { Lock, Mail, Music } from 'lucide-react';
+import { Lock, Mail, User, Music } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 
-const Login = () => {
+const Register = () => {
+  const [pseudo, setPseudo] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
     try {
-      const res = await axios.post('http://localhost:5001/api/auth/login', { email, password });
-      login(res.data.token);
-      navigate('/dashboard');
+      await axios.post('http://localhost:5001/api/auth/register', { pseudo, email, password });
+      alert('✨ Compte créé avec succès ! Bienvenue dans LyricsVault ❄️');
+      navigate('/login');
     } catch (err) {
-      setError('Email ou mot de passe incorrect');
+      setError(err.response?.data?.message || 'Erreur lors de la création du compte');
     } finally {
       setIsLoading(false);
     }
@@ -43,12 +42,12 @@ const Login = () => {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-cyan-900 mb-2">LyricsVault</h1>
-          <p className="text-cyan-700 font-semibold">Ton coffre-fort de paroles ❄️</p>
+          <p className="text-cyan-700 font-semibold">Crée ton compte ❄️</p>
         </div>
 
         {/* Form Card */}
         <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-cyan-100 animate-slideUp">
-          <h2 className="text-2xl font-bold text-cyan-900 mb-6 text-center">Bienvenue !</h2>
+          <h2 className="text-2xl font-bold text-cyan-900 mb-6 text-center">S'inscrire</h2>
 
           {error && (
             <div className="bg-red-100 border-l-4 border-red-500 rounded-lg p-4 mb-6">
@@ -57,6 +56,22 @@ const Login = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Pseudo Input */}
+            <div>
+              <label className="block text-sm font-bold text-cyan-700 mb-2">Nom d'artiste</label>
+              <div className="relative">
+                <User className="absolute left-4 top-3.5 text-cyan-500" size={20} />
+                <input 
+                  type="text" 
+                  placeholder="Ton pseudo" 
+                  required
+                  value={pseudo}
+                  onChange={(e) => setPseudo(e.target.value)}
+                  className="w-full bg-cyan-50 border-2 border-cyan-200 rounded-xl py-3 pl-12 pr-4 text-cyan-900 placeholder-cyan-400 focus:outline-none focus:border-cyan-500 transition font-semibold"
+                />
+              </div>
+            </div>
+
             {/* Email Input */}
             <div>
               <label className="block text-sm font-bold text-cyan-700 mb-2">Email</label>
@@ -95,31 +110,31 @@ const Login = () => {
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-cyan-500 to-cyan-400 text-white font-bold py-4 rounded-xl hover:from-cyan-600 hover:to-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all mt-8 shadow-lg"
             >
-              {isLoading ? 'Connexion...' : 'Entrer dans LyricsVault'}
+              {isLoading ? 'Création...' : 'Créer mon compte'}
             </button>
           </form>
 
-          {/* Register Link */}
+          {/* Login Link */}
           <div className="mt-6 text-center border-t-2 border-cyan-100 pt-6">
             <p className="text-cyan-700 text-sm mb-3">
-              Pas encore de compte ?
+              Tu as déjà un compte ?
             </p>
             <Link 
-              to="/register" 
+              to="/login" 
               className="inline-block px-6 py-2 bg-cyan-100 text-cyan-700 font-bold rounded-full hover:bg-cyan-200 transition"
             >
-              S'inscrire maintenant
+              Se connecter
             </Link>
           </div>
         </div>
 
         {/* Demo Info */}
         <p className="text-center text-cyan-700 text-xs mt-8 font-semibold">
-          🎵 Crée, édite et sauvegarde tes paroles en toute sécurité
+          🎵 Rejoins la communauté des auteurs-compositeurs
         </p>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default Register;
