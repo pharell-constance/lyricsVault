@@ -16,6 +16,9 @@ mongoose.connect(process.env.MONGO_URI)
 const songRoutes = require('./routes/song');
 app.use('/api/songs', songRoutes);
 
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+
 app.get('/', (req, res) => {
   res.send('Bienvenue dans le coffre-fort LyricsVault API 🌙');
 });
